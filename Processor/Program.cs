@@ -1,19 +1,21 @@
-using System.Net;
-using Microsoft.AspNetCore.Builder;
-using MQTTnet;
-using MQTTnet.AspNetCore.Routing;
-using MQTTnet.Client;
 using Processor;
 using Processor.Core;
+using Processor.Core.Extension;
+using Processor.Core.Lib;
+
+async void ConfigureDelegate(IServiceCollection services)
+{
+    services.Configure<HostOptions>(
+        opts => opts.ShutdownTimeout = TimeSpan.FromMinutes(2));
+
+    await services.AddMqtt("localhost", 1883, "admin", "admin");
+    services.AddMqttSerializer<JsonSerializerAdapter>();
+    services.AddMqttSubcribeRouting();
+    await services.AddMqttController();
+    services.AddHostedService<MqttClientRoutingService>();
+}
 
 IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(async services =>
-    {
-        await services.AddMqtt("localhost", 1883, "admin", "admin");
-        services.AddMqttSubcribeRouting();
-        await services.AddMqttController();
-        services.AddHostedService<BackgroundWorker>();
-    })
+    .ConfigureServices(ConfigureDelegate)
     .Build();
-
 host.Run();

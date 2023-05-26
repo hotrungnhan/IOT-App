@@ -1,19 +1,9 @@
 using System.Reflection;
-using MQTTnet;
-using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
+using Processor.Core.Attribute;
+using Processor.Interface;
 
-namespace Processor.Core;
-
-public class MqttControllerAttribute : Attribute
-{
-}
-
-public class MqttContext<T> where T : EventArgs
-{
-    public IManagedMqttClient Client { get; set; }
-    public T Event { get; set; }
-}
+namespace Processor.Core.Extension;
 
 public static class AddMqttControllerExtension
 {
@@ -22,10 +12,11 @@ public static class AddMqttControllerExtension
     {
         // TODO: Replace Assembly.GetExecutingAssembly() with AppDomain.CurrentDomain.GetAssemblies() when release package
         var types = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsDefined(typeof(MqttControllerAttribute)));
+
         var subcribers = types.Aggregate(new List<MethodInfo>(), (acc, cur) =>
         {
             var sub = cur.GetMethods().Where(m => m.IsDefined(
-                typeof(MqttSubcribeAttribute))).ToList();
+                typeof(MqttEventSubcribeAttribute))).ToList();
             acc.AddRange(sub);
             return acc;
         });
@@ -36,15 +27,15 @@ public static class AddMqttControllerExtension
 
         var topics = subcribers.SelectMany(methodInfo =>
         {
-            var attr = methodInfo.GetCustomAttribute<MqttSubcribeAttribute>()!;
+            var attr = methodInfo.GetCustomAttribute<MqttEventSubcribeAttribute>()!;
 
             //add to routing table
-            foreach (var topic in attr.topicFilters)
+            foreach (var topic in attr.TopicFilters)
             {
                 routingTable.AddMethod(topic.Topic, methodInfo);
             }
 
-            return attr.topicFilters;
+            return attr.TopicFilters;
         }).ToList();
 
         // register subcribe

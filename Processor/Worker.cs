@@ -1,7 +1,10 @@
+using System.Security.Cryptography;
+using DTO.Proto;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
 using Newtonsoft.Json;
+using ProtoBuf;
 
 namespace Processor;
 
@@ -22,7 +25,6 @@ public class Worker : BackgroundService
         _mqttClient.ApplicationMessageReceivedAsync += args =>
         {
             var topic = args.ApplicationMessage.Topic;
-            Console.WriteLine(topic);
 
             var payload = args.ApplicationMessage.ConvertPayloadToString();
             Console.WriteLine(payload);

@@ -1,11 +1,9 @@
 using MQTTnet;
-using MQTTnet.Client;
 using MQTTnet.Extensions.ManagedClient;
-using Newtonsoft.Json;
 
-namespace Processor;
+namespace Processor.Core.Extension;
 
-public static class UseMQTT
+public static class UseMqtt
 {
     public static async Task<IManagedMqttClient> AddMqtt(this IServiceCollection service, string host, int port,
         string username, string password)
@@ -26,9 +24,9 @@ public static class UseMQTT
             Console.WriteLine(args.ConnectResult.ResultCode);
             return Task.CompletedTask;
         });
-        Console.WriteLine(await manageClient.InternalClient.TryPingAsync());
         await manageClient.StartAsync(manageClientOptions);
         service.AddSingleton<IManagedMqttClient>(manageClient);
+        service.AddSingleton<RoutingMqttClient>();
         return manageClient;
     }
 }

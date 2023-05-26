@@ -1,10 +1,9 @@
-using MQTTnet;
-using MQTTnet.Client;
-using MQTTnet.Extensions.ManagedClient;
+using Processor.Core.Lib;
+using Processor.Interface;
 
-namespace Processor.Core;
+namespace Processor.Core.Extension;
 
-public static class UseMQTTSubcriberRouting
+public static class UseMqttSubcriberRouting
 {
     public static void AddMqttSubcribeRouting(this IServiceCollection service)
     {
