@@ -2,26 +2,28 @@
 
 ## Why we have this project ?
 
-I make my IOT project and choose C#,MQTT as my core to process stream data from IOT device.
+enhanced features in the context of an IoT project implemented in C# using MQTT as the core protocol for processing streaming data from IoT devices.
+
+The project architecture involves the following components:
 
 ```
                   Authenticate HTTP Client
                             ^
                             |
-                            |           -> Subcriber Processor via C# dotnet 
-publisher IOT device -> Broker EMQX     -> Subcriber Processor via C# dotnet -> Click house DB 
-                                        -> Subcriber Processor via C# dotnet    
+                            |          -> Subcriber Processor via C# dotnet 
+publisher IOT device ->   Broker EMQX  -> Subcriber Processor via C# dotnet -> Click house DB 
+                            |           -> Subcriber Processor via C# dotnet    
                             |
                             |
                             V
                     Application Mobile 
 ```
 
-I kinda frustrated when using MQTTNet lib to connect to MQTT, cus it have no Routing, no Serializer,... by default.
-So i decide to make my own project to use what i need.
+While working with the MQTTNet library to connect to MQTT, it was found that the library lacks built-in support for routing and serialization, which led to frustration. Consequently, a decision was made to create a custom project that fulfills the required functionalities
 
-## Package Main Architecture
+## Package Architecture
 
+The package architecture revolves around the concept of a multiplexer, which enables efficient routing of MQTT events based on topics to their respective handlers. The structure is as follows:
 
 ```
                           -> Topic 3,4 -> handler 3
@@ -30,12 +32,13 @@ MQTT event -> Multiplexer -> Topic 2,3 -> handler 2 , handler 4
 ```
 ## Goal /Feature
 
-* Fast-Enough multiplexer routing (implement via Radix)
-* Topic Path params
-* Controller Constructor DI (like ASPdotnet)
-* Queue event
-* Protobuff/ Json Serilize (have two option, depend use case).
-* Allow multiple MQTT client at the same time (optional feature) 
-* full Unit Test
+* Fast and efficient multiplexer routing utilizing a Radix implementation
+* Support for topic path parameters
+* Dependency Injection in controller constructors, akin to ASP.NET
+* Event queuing
+* Protobuf and JSON serialization options (depending on use case)
+* Ability to handle multiple MQTT clients concurrently (optional feature)
+* Comprehensive unit testing
+
 ## PS 
-> This is very begining state of this project, only routing work now.
+> Please note that the project is currently in its initial stages, with only the routing functionality implemented so far.
