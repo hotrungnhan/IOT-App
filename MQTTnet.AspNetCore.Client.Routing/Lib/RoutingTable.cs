@@ -1,8 +1,8 @@
 using System.Reflection;
-using Processor.Interface;
+using MQTTnet.AspNetCore.Client.Routing.Interface;
 using Zyborg.Collections;
 
-namespace Processor.Core.Lib;
+namespace MQTTnet.AspNetCore.Client.Routing.Lib;
 
 public class RoutingTable : IRoutingTable
 {

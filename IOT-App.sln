@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Processor", "Processor\Processor.csproj", "{2F02EDED-E84B-443B-B557-7C6A02F728A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTnet.AspNetCore.Client.Routing", "MQTTnet.AspNetCore.Client.Routing\MQTTnet.AspNetCore.Client.Routing.csproj", "{3648BB9E-5CDD-4486-A748-A6E2F671DC4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MQTTnet.AspNetCore.Client.Routing.Testing", "MQTTnet.AspNetCore.Client.Routing.Testing\MQTTnet.AspNetCore.Client.Routing.Testing.csproj", "{17EF52D9-7328-41FB-9D9F-28CD073A5ED2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{2F02EDED-E84B-443B-B557-7C6A02F728A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2F02EDED-E84B-443B-B557-7C6A02F728A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2F02EDED-E84B-443B-B557-7C6A02F728A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3648BB9E-5CDD-4486-A748-A6E2F671DC4C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3648BB9E-5CDD-4486-A748-A6E2F671DC4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3648BB9E-5CDD-4486-A748-A6E2F671DC4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3648BB9E-5CDD-4486-A748-A6E2F671DC4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17EF52D9-7328-41FB-9D9F-28CD073A5ED2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17EF52D9-7328-41FB-9D9F-28CD073A5ED2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17EF52D9-7328-41FB-9D9F-28CD073A5ED2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17EF52D9-7328-41FB-9D9F-28CD073A5ED2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

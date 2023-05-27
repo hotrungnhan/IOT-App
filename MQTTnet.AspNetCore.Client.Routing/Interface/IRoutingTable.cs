@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Processor.Interface;
+namespace MQTTnet.AspNetCore.Client.Routing.Interface;
 
 public interface IRoutingTable
 {

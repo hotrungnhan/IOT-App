@@ -1,9 +1,10 @@
 using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using MQTTnet.AspNetCore.Client.Routing.Attribute;
+using MQTTnet.AspNetCore.Client.Routing.Interface;
 using MQTTnet.Extensions.ManagedClient;
-using Processor.Core.Attribute;
-using Processor.Interface;
 
-namespace Processor.Core.Extension;
+namespace MQTTnet.AspNetCore.Client.Routing.Extension;
 
 public static class AddMqttControllerExtension
 {
@@ -11,7 +12,8 @@ public static class AddMqttControllerExtension
     public static async Task AddMqttController(this IServiceCollection service)
     {
         // TODO: Replace Assembly.GetExecutingAssembly() with AppDomain.CurrentDomain.GetAssemblies() when release package
-        var types = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsDefined(typeof(MqttControllerAttribute)));
+        var types = AppDomain.CurrentDomain.GetAssemblies().Select(s => s.GetType())
+            .Where(t => t.IsDefined(typeof(MqttControllerAttribute)));
 
         var subcribers = types.Aggregate(new List<MethodInfo>(), (acc, cur) =>
         {

@@ -1,6 +1,7 @@
+using MQTTnet.AspNetCore.Client.Routing.Interface;
 using ProtoBuf;
 
-namespace Processor.Core.Lib;
+namespace MQTTnet.AspNetCore.Client.Routing.Lib;
 
 public class ProtobufSerializerAdapter : ISerializer
 {

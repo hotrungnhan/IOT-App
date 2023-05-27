@@ -27,4 +27,8 @@
         <Link>.dockerignore</Link>
       </Content>
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MQTTnet.AspNetCore.Client.Routing\MQTTnet.AspNetCore.Client.Routing.csproj" />
+    </ItemGroup>
 </Project>

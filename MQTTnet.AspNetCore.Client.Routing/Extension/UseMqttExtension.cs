@@ -1,11 +1,11 @@
-using MQTTnet;
+using Microsoft.Extensions.DependencyInjection;
 using MQTTnet.Extensions.ManagedClient;
 
-namespace Processor.Core.Extension;
+namespace MQTTnet.AspNetCore.Client.Routing.Extension;
 
 public static class UseMqtt
 {
-    public static async Task<IManagedMqttClient> AddMqtt(this IServiceCollection service, string host, int port,
+    public static Task<IManagedMqttClient> AddMqtt(this IServiceCollection service, string host, int port,
         string username, string password)
     {
         var mqttFactory = new MqttFactory();
@@ -18,15 +18,9 @@ public static class UseMqtt
         var manageClientOptions = new ManagedMqttClientOptionsBuilder().WithClientOptions(clientOptions).Build();
         var manageClient = mqttFactory.CreateManagedMqttClient();
 
-        // await manageClient.PingAsync(CancellationToken.None);
-        manageClient.ConnectedAsync += (args =>
-        {
-            Console.WriteLine(args.ConnectResult.ResultCode);
-            return Task.CompletedTask;
-        });
-        await manageClient.StartAsync(manageClientOptions);
+        service.AddSingleton(manageClientOptions);
         service.AddSingleton<IManagedMqttClient>(manageClient);
         service.AddSingleton<RoutingMqttClient>();
-        return manageClient;
+        return Task.FromResult(manageClient);
     }
 }

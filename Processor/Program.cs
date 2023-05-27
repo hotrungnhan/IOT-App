@@ -1,7 +1,6 @@
-using Processor;
-using Processor.Core;
-using Processor.Core.Extension;
-using Processor.Core.Lib;
+using MQTTnet.AspNetCore.Client.Routing;
+using MQTTnet.AspNetCore.Client.Routing.Extension;
+using MQTTnet.AspNetCore.Client.Routing.Lib;
 
 async void ConfigureDelegate(IServiceCollection services)
 {

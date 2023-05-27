@@ -1,6 +1,11 @@
-namespace Processor.Core.Attribute;
+namespace MQTTnet.AspNetCore.Client.Routing.Attribute;
 
 public class FromEventAttribute :
+    System.Attribute
+{
+}
+
+public class FromPayloadAttribute :
     System.Attribute
 {
 }

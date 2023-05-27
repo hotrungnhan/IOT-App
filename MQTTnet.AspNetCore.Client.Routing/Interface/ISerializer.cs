@@ -1,4 +1,4 @@
-namespace Processor.Core.Lib;
+namespace MQTTnet.AspNetCore.Client.Routing.Interface;
 
 public interface ISerializer
 {

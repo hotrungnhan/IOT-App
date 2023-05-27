@@ -1,8 +1,8 @@
 using System.Text;
+using MQTTnet.AspNetCore.Client.Routing.Interface;
 using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
-namespace Processor.Core.Lib;
+namespace MQTTnet.AspNetCore.Client.Routing.Lib;
 
 public class JsonSerializerAdapter : ISerializer
 {

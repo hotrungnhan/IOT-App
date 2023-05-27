@@ -1,7 +1,8 @@
-using Processor.Core.Lib;
-using Processor.Interface;
+using Microsoft.Extensions.DependencyInjection;
+using MQTTnet.AspNetCore.Client.Routing.Interface;
+using MQTTnet.AspNetCore.Client.Routing.Lib;
 
-namespace Processor.Core.Extension;
+namespace MQTTnet.AspNetCore.Client.Routing.Extension;
 
 public static class UseMqttSubcriberRouting
 {

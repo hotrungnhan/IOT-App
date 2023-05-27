@@ -1,6 +1,7 @@
-using Processor.Core.Lib;
+using Microsoft.Extensions.DependencyInjection;
+using MQTTnet.AspNetCore.Client.Routing.Interface;
 
-namespace Processor.Core.Extension;
+namespace MQTTnet.AspNetCore.Client.Routing.Extension;
 
 public static class UseMQTTSerializerExtension
 {

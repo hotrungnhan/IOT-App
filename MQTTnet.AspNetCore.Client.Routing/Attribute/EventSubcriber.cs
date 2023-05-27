@@ -1,7 +1,7 @@
 using MQTTnet.Packets;
 using MQTTnet.Protocol;
 
-namespace Processor.Core.Attribute;
+namespace MQTTnet.AspNetCore.Client.Routing.Attribute;
 
 public class MqttEventSubcribeAttribute : System.Attribute
 {
