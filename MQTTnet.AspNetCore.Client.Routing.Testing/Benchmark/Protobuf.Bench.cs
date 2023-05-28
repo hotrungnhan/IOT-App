@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 using MQTTnet.AspNetCore.Client.Routing.Lib;
-using MQTTnet.AspNetCore.Client.Routing.Tests.Model;
+using MQTTnet.AspNetCore.Client.Routing.Testing.Model;
 
 namespace MQTTnet.AspNetCore.Client.Routing.Testing.Benchmark;
 

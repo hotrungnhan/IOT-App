@@ -22,19 +22,19 @@ public class MqttClientRoutingService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        // _mqttClient.ApplicationMessageReceivedAsync += async args => { };
         await _routingMqttClient.Start()!;
         while (!stoppingToken.IsCancellationRequested)
         {
             // var json = JsonConvert.SerializeObject(new TemperatureDataUnit());
-            var bytes = Encoding.UTF8.GetBytes("12312");
+
+            // moving to testing
+            // await _routingMqttClient.InvokeReceivedEvent(new MqttApplicationMessageReceivedEventArgs(
+            //     "12d12d1", new MqttApplicationMessage
+            //     {
+            //         Topic = "topic2",
+            //         PayloadSegment = bytes,
+            //     }, new MqttPublishPacket(), null))!;
             await Task.Delay(1000, stoppingToken);
-            await _routingMqttClient.InvokeReceivedEvent(new MqttApplicationMessageReceivedEventArgs(
-                "12d12d1", new MqttApplicationMessage
-                {
-                    Topic = "topic2",
-                    PayloadSegment = bytes,
-                }, new MqttPublishPacket(), null))!;
         }
 
         // Todo : fix this

@@ -3,16 +3,17 @@ using MQTTnet.Protocol;
 
 namespace MQTTnet.AspNetCore.Client.Routing.Attribute;
 
-public class MqttEventSubcribeAttribute : System.Attribute
+public class MqttEventSubscribeAttribute : System.Attribute
 {
     internal readonly ICollection<MqttTopicFilter> TopicFilters;
 
-    public MqttEventSubcribeAttribute(ICollection<MqttTopicFilter> topicFilters)
+    public MqttEventSubscribeAttribute(ICollection<MqttTopicFilter> topicFilters)
     {
         this.TopicFilters = topicFilters;
     }
 
-    public MqttEventSubcribeAttribute(string topic,
+
+    public MqttEventSubscribeAttribute(string topic,
         MqttQualityOfServiceLevel qos = MqttQualityOfServiceLevel.AtMostOnce)
     {
         TopicFilters = new List<MqttTopicFilter>

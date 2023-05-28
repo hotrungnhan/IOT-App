@@ -7,7 +7,7 @@ namespace Processor.Controller;
 [MqttController]
 public class TemplateController : BaseMqttController
 {
-    [MqttEventSubcribe("topic")]
+    [MqttEventSubscribe("topic")]
     public Task Method()
     {
         var e = this.Event as MqttApplicationMessageReceivedEventArgs;
@@ -16,7 +16,7 @@ public class TemplateController : BaseMqttController
         return Task.CompletedTask;
     }
 
-    [MqttEventSubcribe("topic2")]
+    [MqttEventSubscribe("topic2")]
     public Task Method2([FromPayload] TemperatureDataUnit payload)
     {
         var e = this.Event as MqttApplicationMessageReceivedEventArgs;

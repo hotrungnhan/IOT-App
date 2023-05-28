@@ -9,8 +9,8 @@ async void ConfigureDelegate(IServiceCollection services)
 
     await services.AddMqtt("localhost", 1883, "admin", "admin");
     services.AddMqttSerializer<JsonSerializerAdapter>();
-    services.AddMqttSubcribeRouting();
-    await services.AddMqttController();
+    services.AddMqttSubcribe();
+    services.AddRouter();
     services.AddHostedService<MqttClientRoutingService>();
 }
 

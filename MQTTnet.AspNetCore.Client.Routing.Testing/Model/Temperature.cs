@@ -1,4 +1,4 @@
-namespace MQTTnet.AspNetCore.Client.Routing.Tests.Model;
+namespace MQTTnet.AspNetCore.Client.Routing.Testing.Model;
 
 public class Temperature
 {
