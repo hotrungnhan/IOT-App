@@ -24,6 +24,6 @@ public class MqttRouteContext
     public MethodInfo Handler { get; set; }
 
     public IReadOnlyDictionary<string, object> Parameters { get; set; }
-    public bool HaveControllerParameter { get; internal set; }
-    public RouteTemplate ControllerTemplate { get; internal set; }
+    // public bool HaveControllerParameter { get; internal set; }
+    // public RouteTemplate ControllerTemplate { get; internal set; }
 }

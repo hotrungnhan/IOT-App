@@ -5,7 +5,7 @@ namespace MQTTnet.AspNetCore.Client.Routing.Extension;
 
 public static class UseMQTTSerializerExtension
 {
-    public static IServiceCollection AddMqttSerializer<T>(this IServiceCollection service, T? instance = null)
+    public static void AddMqttSerializer<T>(this IServiceCollection service, T? instance = null)
         where T : class, ISerializer
     {
         if (instance != null)
@@ -16,7 +16,5 @@ public static class UseMQTTSerializerExtension
         {
             service.AddSingleton<ISerializer, T>();
         }
-
-        return service;
     }
 }

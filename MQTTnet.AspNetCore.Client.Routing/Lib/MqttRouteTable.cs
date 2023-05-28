@@ -12,7 +12,7 @@ namespace MQTTnet.AspNetCore.Client.Routing.Lib
             Routes = routes;
         }
 
-        public MqttRoute[] Routes { get; }
+        private MqttRoute[] Routes { get; }
 
         internal void Route(MqttRouteContext routeContext)
         {

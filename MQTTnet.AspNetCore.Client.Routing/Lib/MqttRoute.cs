@@ -129,8 +129,8 @@ namespace MQTTnet.AspNetCore.Client.Routing.Lib
             {
                 context.Parameters = parameters;
                 context.Handler = Handler;
-                context.HaveControllerParameter = HaveControllerParameter;
-                context.ControllerTemplate = ControllerTemplate;
+                // context.HaveControllerParameter = HaveControllerParameter;
+                // context.ControllerTemplate = ControllerTemplate;
             }
         }
     }

@@ -1,6 +1,12 @@
+using System.Text;
+using MQTTnet;
 using MQTTnet.AspNetCore.Client.Routing;
 using MQTTnet.AspNetCore.Client.Routing.Extension;
 using MQTTnet.AspNetCore.Client.Routing.Lib;
+using MQTTnet.Client;
+using MQTTnet.Packets;
+using Newtonsoft.Json;
+using Processor;
 
 async void ConfigureDelegate(IServiceCollection services)
 {
@@ -17,4 +23,20 @@ async void ConfigureDelegate(IServiceCollection services)
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(ConfigureDelegate)
     .Build();
-host.Run();
+var router = host.Services.GetService<MqttRouter>();
+while (true)
+{
+    var json = JsonConvert.SerializeObject(new TemperatureDataUnit());
+    var bytes = Encoding.UTF8.GetBytes(json);
+    await router?.OnMessageReceiveEvent(host.Services
+        , new MqttApplicationMessageReceivedEventArgs(
+            "12d12d1", new MqttApplicationMessage
+            {
+                Topic = "topic2/1231231231",
+                PayloadSegment = bytes,
+            }, new MqttPublishPacket(), null),
+        false)!;
+    await Task.Delay(1000);
+}
+
+// host.Run();

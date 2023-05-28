@@ -7,21 +7,13 @@ namespace Processor.Controller;
 [MqttController]
 public class TemplateController : BaseMqttController
 {
-    [MqttEventSubscribe("topic")]
-    public Task Method()
+    [MqttEventSubscribe("topic2/{id:int}")]
+    public void Method2(int id, [FromPayload] TemperatureDataUnit payload, [FromTopic] string topic)
     {
-        var e = this.Event as MqttApplicationMessageReceivedEventArgs;
-        Console.WriteLine(e.ApplicationMessage.Topic);
-        Console.WriteLine("topic invoke");
-        return Task.CompletedTask;
-    }
-
-    [MqttEventSubscribe("topic2")]
-    public Task Method2([FromPayload] TemperatureDataUnit payload)
-    {
-        var e = this.Event as MqttApplicationMessageReceivedEventArgs;
+        var e = Event as MqttApplicationMessageReceivedEventArgs;
         Console.WriteLine(payload);
-        Console.WriteLine("topic invoke");
-        return Task.CompletedTask;
+        Console.WriteLine(topic);
+        Console.WriteLine(id);
+        // return Task.CompletedTask;
     }
 }

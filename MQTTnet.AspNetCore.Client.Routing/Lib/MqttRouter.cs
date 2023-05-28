@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MQTTnet.AspNetCore.Client.Routing.Attribute;
 using MQTTnet.AspNetCore.Client.Routing.Interface;
 using MQTTnet.Client;
+using MQTTnet.Extensions.ManagedClient;
 
 namespace MQTTnet.AspNetCore.Client.Routing.Lib
 {
@@ -24,17 +25,9 @@ namespace MQTTnet.AspNetCore.Client.Routing.Lib
             this.typeActivator = typeActivator;
         }
 
-        internal async Task OnMessageReceiveEvent(IServiceProvider svcProvider,
+        public async Task OnMessageReceiveEvent(IServiceProvider svcProvider,
             MqttApplicationMessageReceivedEventArgs context, bool allowUnmatchedRoutes)
         {
-            // Don't process messages sent from the server itself. This avoids footguns like a server failing to publish
-            // a message because a route isn't found on a controller.
-
-            // if (context.ClientId == null)
-            // {
-            //     return;
-            // }
-
             var routeContext = new MqttRouteContext(context.ApplicationMessage.Topic);
 
             routeTable.Route(routeContext);
@@ -52,108 +45,111 @@ namespace MQTTnet.AspNetCore.Client.Routing.Lib
             }
             else
             {
-                using (var scope = svcProvider.CreateScope())
+                using var scope = svcProvider.CreateScope();
+                Type? declaringType = routeContext.Handler.DeclaringType;
+
+                if (declaringType == null)
                 {
-                    Type? declaringType = routeContext.Handler.DeclaringType;
+                    throw new InvalidOperationException($"{routeContext.Handler} must have a declaring type.");
+                }
 
-                    if (declaringType == null)
+                var classInstance = typeActivator.CreateInstance<object>(scope.ServiceProvider, declaringType);
+
+                if (classInstance is BaseMqttController basec)
+                {
+                    basec.Client = svcProvider.GetRequiredService<IManagedMqttClient>();
+                    basec.Event = context;
+                }
+                // Potential perf improvement is to cache this reflection work in the future.
+                // var activateProperties = declaringType.GetRuntimeProperties()
+                //     .Where((property) =>
+                //     {
+                //         return
+                //             // property.IsDefined(typeof(MqttControllerContextAttribute)) &&
+                //             property.GetIndexParameters().Length == 0 &&
+                //             property.SetMethod != null &&
+                //             !property.SetMethod.IsStatic;
+                //     })
+                //     .ToArray();
+
+
+                // if (activateProperties.Length == 0)
+                // {
+                //     logger.LogDebug(
+                //         $"MqttController '{declaringType.FullName}' does not have a property that can accept a controller context.  You may want to add a [{nameof(MqttControllerContextAttribute)}] to a pubilc property.");
+                // }
+
+                // var controllerContext = new MqttControllerContext()
+                // {
+                //     MqttContext = context,
+                //     MqttServer = scope.ServiceProvider.GetRequiredService<MqttServer>()
+                // };
+                //
+                // for (int i = 0; i < activateProperties.Length; i++)
+                // {
+                //     PropertyInfo property = activateProperties[i];
+                //     property.SetValue(classInstance, controllerContext);
+                // }
+
+                // if (routeContext.HaveControllerParameter)
+                // {
+                //     var tmpx = routeContext.ControllerTemplate;
+                //     tmpx.Segments.Where(p => p.IsParameter).ToList().ForEach(ts =>
+                //     {
+                //         var pro = declaringType.GetRuntimeProperty(ts.Value);
+                //         if (pro != null)
+                //         {
+                //             if (routeContext.Parameters.TryGetValue(ts.Value, out object pvalue))
+                //             {
+                //                 pro.SetValue(classInstance, pvalue);
+                //             }
+                //         }
+                //     });
+                // }
+
+                ParameterInfo[] parameters = routeContext.Handler.GetParameters();
+
+                // context.ProcessPublish = true;
+
+                if (parameters.Length == 0)
+                {
+                    await HandlerInvoker(routeContext.Handler, classInstance, null).ConfigureAwait(false);
+                }
+                else
+                {
+                    object?[] paramArray;
+
+                    try
                     {
-                        throw new InvalidOperationException($"{routeContext.Handler} must have a declaring type.");
+                        paramArray = parameters.Select(p =>
+                                MatchParameterOrThrow(p, routeContext.Parameters,
+                                    context,
+                                    svcProvider)
+                            )
+                            .ToArray();
+
+                        await HandlerInvoker(routeContext.Handler, classInstance, paramArray).ConfigureAwait(false);
                     }
-
-                    var classInstance = typeActivator.CreateInstance<object>(scope.ServiceProvider, declaringType);
-
-                    // Potential perf improvement is to cache this reflection work in the future.
-                    var activateProperties = declaringType.GetRuntimeProperties()
-                        .Where((property) =>
-                        {
-                            return
-                                // property.IsDefined(typeof(MqttControllerContextAttribute)) &&
-                                property.GetIndexParameters().Length == 0 &&
-                                property.SetMethod != null &&
-                                !property.SetMethod.IsStatic;
-                        })
-                        .ToArray();
-
-
-                    // if (activateProperties.Length == 0)
-                    // {
-                    //     logger.LogDebug(
-                    //         $"MqttController '{declaringType.FullName}' does not have a property that can accept a controller context.  You may want to add a [{nameof(MqttControllerContextAttribute)}] to a pubilc property.");
-                    // }
-
-                    // var controllerContext = new MqttControllerContext()
-                    // {
-                    //     MqttContext = context,
-                    //     MqttServer = scope.ServiceProvider.GetRequiredService<MqttServer>()
-                    // };
-                    //
-                    // for (int i = 0; i < activateProperties.Length; i++)
-                    // {
-                    //     PropertyInfo property = activateProperties[i];
-                    //     property.SetValue(classInstance, controllerContext);
-                    // }
-
-                    if (routeContext.HaveControllerParameter)
+                    catch (ArgumentException ex)
                     {
-                        var tmpx = routeContext.ControllerTemplate;
-                        tmpx.Segments.Where(p => p.IsParameter).ToList().ForEach(ts =>
-                        {
-                            var pro = declaringType.GetRuntimeProperty(ts.Value);
-                            if (pro != null)
-                            {
-                                if (routeContext.Parameters.TryGetValue(ts.Value, out object pvalue))
-                                {
-                                    pro.SetValue(classInstance, pvalue);
-                                }
-                            }
-                        });
+                        logger.LogError(ex,
+                            $"Unable to match route parameters to all arguments. See inner exception for details.");
+
+                        // context.ProcessPublish = false;
                     }
-
-                    ParameterInfo[] parameters = routeContext.Handler.GetParameters();
-
-                    // context.ProcessPublish = true;
-
-                    if (parameters.Length == 0)
+                    catch (TargetInvocationException ex)
                     {
-                        await HandlerInvoker(routeContext.Handler, classInstance, null).ConfigureAwait(false);
+                        logger.LogError(ex.InnerException,
+                            $"Unhandled MQTT action exception. See inner exception for details.");
+
+                        // This is an unandled exception from the invoked action
+                        // context.ProcessPublish = false;
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        object?[] paramArray;
+                        logger.LogError(ex, "Unable to invoke Mqtt Action.  See inner exception for details.");
 
-                        try
-                        {
-                            paramArray = parameters.Select(p =>
-                                    MatchParameterOrThrow(p, routeContext.Parameters,
-                                        // controllerContext, 
-                                        svcProvider)
-                                )
-                                .ToArray();
-
-                            await HandlerInvoker(routeContext.Handler, classInstance, paramArray).ConfigureAwait(false);
-                        }
-                        catch (ArgumentException ex)
-                        {
-                            logger.LogError(ex,
-                                $"Unable to match route parameters to all arguments. See inner exception for details.");
-
-                            // context.ProcessPublish = false;
-                        }
-                        catch (TargetInvocationException ex)
-                        {
-                            logger.LogError(ex.InnerException,
-                                $"Unhandled MQTT action exception. See inner exception for details.");
-
-                            // This is an unandled exception from the invoked action
-                            // context.ProcessPublish = false;
-                        }
-                        catch (Exception ex)
-                        {
-                            logger.LogError(ex, "Unable to invoke Mqtt Action.  See inner exception for details.");
-
-                            // context.ProcessPublish = false;
-                        }
+                        // context.ProcessPublish = false;
                     }
                 }
             }
@@ -186,17 +182,23 @@ namespace MQTTnet.AspNetCore.Client.Routing.Lib
 
         private static object? MatchParameterOrThrow(ParameterInfo param,
             IReadOnlyDictionary<string, object> availableParmeters,
-            // MqttControllerContext controllerContext,
+            MqttApplicationMessageReceivedEventArgs context,
             IServiceProvider serviceProvider)
         {
             if (param.IsDefined(typeof(FromPayloadAttribute), false))
             {
-                // JsonSerializerOptions? defaultOptions =
-                //     serviceProvider.GetService<MqttDefaultJsonOptions>()?.SerializerOptions;
-                // return JsonSerializer.Deserialize(controllerContext.MqttContext.ApplicationMessage.Payload,
-                //     param.ParameterType,
-                //     defaultOptions
-                // );
+                var serializer = serviceProvider.GetRequiredService<ISerializer>();
+                var method = serializer.GetType().GetMethod(nameof(ISerializer.Deserialize));
+                var genericSerialize = method?.MakeGenericMethod(param.ParameterType);
+                var payload =
+                    genericSerialize?.Invoke(serializer,
+                        new object?[] { context.ApplicationMessage.PayloadSegment.ToArray() });
+                return payload;
+            }
+
+            if (param.IsDefined(typeof(FromTopicAttribute), false))
+            {
+                return context.ApplicationMessage.Topic;
             }
 
             if (!availableParmeters.TryGetValue(param.Name, out object? value))
